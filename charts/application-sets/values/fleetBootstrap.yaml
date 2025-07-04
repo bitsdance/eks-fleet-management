@@ -24,6 +24,22 @@ fleet-argocd:
   releaseName: fleet-argocd
   defaultVersion: "7.5.2"
   chartRepository: "https://argoproj.github.io/argo-helm"
+  valuesObject:
+    global:
+      domain: '{{default "" (index .metadata.annotations "argocd_dns")}}'
+  additionalResources:
+    path: "charts/argocd-ingress"
+    type: "ingress"
+    helm:
+     releaseName: ingress
+     valuesObject:
+        ingressClass:
+          useAutomode: '{{default "false" (index .metadata.annotations "enable_automode")}}'
+        ingress:
+          domain: '{{default "" (index .metadata.annotations "argocd_dns")}}'
+          privateCertificate: '{{default "" (index .metadata.annotations "argocd_ingress_certificate")}}'
+          rules:
+            - host: '{{default "argocd.example.com" (index .metadata.annotations "argocd_dns")}}'
 fleet-iam-chart:
   chartName: iam-chart
   releaseName: fleet-iam-ack
@@ -48,4 +64,3 @@ fleet-ack-eks:
       region: '{{.metadata.annotations.aws_region}}'
     serviceAccount:
       name: '{{.metadata.annotations.ack_eks_service_account}}'
-    

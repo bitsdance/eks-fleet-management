@@ -21,7 +21,7 @@ generators:
                 {{- if $chartConfig.selectorMatchLabels }}
                 {{- toYaml $chartConfig.selectorMatchLabels | nindent 18 }}
                 {{- end }}
-              {{- if and $chartConfig.selector $useSelectors }}
+              {{- if and $chartConfig.selector (eq $useSelectors "true") }}
                 {{- toYaml $chartConfig.selector | nindent 16 }}
               {{- end }}
           values:

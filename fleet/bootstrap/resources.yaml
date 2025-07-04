@@ -123,9 +123,8 @@ spec:
           helm:
             ignoreMissingValueFiles: true
             valuesObject:
-              useSelectors: false
+              useSelectors: '{{.values.useSelectors}}'
               useVersionSelectors: '{{.values.useVersionSelectors}}'
-            # Defining the way to group monitoring This application set will handly monitoring and ACK values
               releaseType: '{{.type | lower }}'
               {{- if eq .values.useVersionSelectors "true"}}
               releases:
@@ -135,9 +134,6 @@ spec:
               globalSelectors:
                 fleet_member: hub-cluster
               {{- end }}
-              mergeValues:
-                resources: 
-                  use: true
             valueFiles:
               - $resourcesValues/resources/bootstrap/defaults/resources.yaml
             {{- range $repoName := $repoNames }}

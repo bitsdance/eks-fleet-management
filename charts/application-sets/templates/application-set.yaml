@@ -1,8 +1,8 @@
 {{/* First, import and merge all values files based on enabled components */}}
 {{- $values := .Values }}
 {{- $releaseType := .Values.releaseType }}
-{{- $useVersionSelectors := .Values.useVersionSelectors}}
-{{- $useSelectors:= .Values.useSelectors  -}}
+{{- $useVersionSelectors := .Values.useVersionSelectors | toString }}
+{{- $useSelectors := .Values.useSelectors | toString -}}
 {{- $globalSelectors  := .Values.globalSelectors   -}}
 {{- $chartType := .Values.chartType }}
 {{- $namespace := .Values.namespace }}
@@ -16,6 +16,8 @@
 {{- $valuesFilePrefix :=  .Values.valuesFilePrefix -}}
 {{- $useValuesFilePrefix := (default false .Values.useValuesFilePrefix )  -}}
 {{- $argoProjectName := (default "default" .Values.argoProjectName ) -}}
+{{- $applyNestedSelectors := default "false" .Values.applyNestedSelectors -}}
+{{- $templatePatch := .Values.templatePatch -}}
 
 {{/* Merge values From Default */}}
 {{- if .Values.mergeValues -}}
@@ -26,7 +28,7 @@
 
 {{- range $chartName, $chartConfig := .Values }}
 {{- if and (kindIs "map" $chartConfig) (hasKey $chartConfig "enabled") }}
-{{- if eq (toString $chartConfig.enabled) "true" }}
+{{- if eq ($chartConfig.enabled | toString) "true" }}
 {{- $nameNormalize := printf "%s" $chartName | replace "_" "-" | trunc 63 | trimSuffix "-"  -}}
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -45,18 +47,44 @@ metadata:
     {{- if $chartConfig.labelsAppSet }}{{- toYaml $chartConfig.labelsAppSet | nindent 4 }}{{- end }}
 spec:
   goTemplate: true
-  {{- if $chartConfig.goTemplateOptions }}
-  goTemplateOptions:
-  {{ toYaml $chartConfig.goTemplateOptions | nindent 2 }}
-  {{- else }}
-  goTemplateOptions: {{ default (list "missingkey=error") $goTemplateOptions }}
-  {{- end }}
   {{- if $chartConfig.syncPolicyAppSet }}
   syncPolicy:
   {{- toYaml $chartConfig.syncPolicyAppSet | nindent 4 }}
   {{- else }}
   syncPolicy:
   {{- toYaml $syncPolicyAppSet | nindent 4 }}
+  {{- end }}
+  {{- if $chartConfig.goTemplateOptions }}
+  goTemplateOptions:
+  {{ toYaml $chartConfig.goTemplateOptions | nindent 2 }}
+  {{- else }}
+  goTemplateOptions: {{ default (list "missingkey=error") $goTemplateOptions }}
+  {{- end }}
+  {{- if $chartConfig.ignoreApplicationDifferences }}
+  ignoreApplicationDifferences:
+  {{- toYaml $chartConfig.ignoreApplicationDifferences | nindent 2 }}
+  {{- end }}
+  {{- if $chartConfig.preservedFields }}
+  preservedFields:
+  {{- toYaml $chartConfig.preservedFields | nindent 4 }}
+  {{- end }}
+  {{- if $chartConfig.strategy }}
+  strategy:
+  {{- toYaml $chartConfig.strategy | nindent 4 }}
+  {{- end }}
+  {{- if $chartConfig.templatePatch }}
+  templatePatch: {{- $chartConfig.templatePatch  | toYaml | indent 1  }}
+  {{- else }}
+  {{- if $templatePatch }}
+  templatePatch: {{- $templatePatch  | toYaml | indent 1   }}
+  {{- end }}
+  {{- end }}
+  {{- if $applyNestedSelectors }}
+  applyNestedSelectors: {{ $applyNestedSelectors }}
+  {{- else }}
+  {{- if $chartConfig.applyNestedSelectors }}
+  applyNestedSelectors: {{ $chartConfig.applyNestedSelectors }}
+  {{- end }}
   {{- end }}
   {{- if $chartConfig.gitMatrix }}
   {{ include "application-sets.git-matrix" (dict 
@@ -74,7 +102,7 @@ spec:
           - clusters:
               selector:
                 matchLabels:
-                  {{- if eq (toString $useVersionSelectors) "true" }}
+                  {{- if eq $useVersionSelectors "true" }}
                     {{- if $values.releases }}
                       {{- range $releaseName, $release := $values.releases}}
                   {{ $releaseName }}: {{ $release }}
@@ -88,7 +116,7 @@ spec:
                   {{- if $chartConfig.selectorMatchLabels }}
                   {{- toYaml $chartConfig.selectorMatchLabels | nindent 18 }}
                   {{- end }}
-              {{- if and $chartConfig.selector $useSelectors }}
+              {{- if and $chartConfig.selector (eq $useSelectors "true") }}
                 {{- toYaml $chartConfig.selector | nindent 16 }}
               {{- end }}
               {{- if not $chartConfig.resourceGroup }}
@@ -125,13 +153,22 @@ spec:
       {{- else }}
       name: '{{$releaseType}}-{{`{{ .name | trunc 30 }}`}}-{{ $nameNormalize | trunc 20 }}-{{`{{ .values.addonChartVersion }}`}}'
       {{- end }}
+      annotations:
+        {{- include "application-sets.annotations" $ | nindent 8 }}
+        {{- if $chartConfig.annotationsApp }}{{- toYaml $chartConfig.annotationsApp | nindent 8 }}{{- end }}
+      labels:
+        {{- include "application-sets.labels" $ | nindent 8 }}
+        {{- if $chartConfig.labelsApp }}{{- toYaml $chartConfig.labelsApp | nindent 8 }}{{- end }}
+        component: '{{ $nameNormalize }}'
+        environment: '{{`{{.metadata.labels.environment}}`}}'
+        cluster: '{{`{{.name}}`}}'
     spec:
       project: {{ $argoProjectName }}
       sources:
       - repoURL: {{ $repoURLGit | squote}}
         targetRevision: {{ $repoURLGitRevision | squote }}
         ref: values
-        {{- if eq (toString $chartConfig.enableAckPodIdentity) "true" }}
+        {{- if eq ($chartConfig.enableAckPodIdentity | toString) "true" }}
         {{ include "application-sets.pod-identity" (dict 
           "chartName" ($chartConfig.chartName | default $nameNormalize)
           "valueFiles" $valueFiles 

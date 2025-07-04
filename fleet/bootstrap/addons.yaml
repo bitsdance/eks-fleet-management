@@ -24,7 +24,7 @@ spec:
                     chartPath: "charts/application-sets"
                     applicationSetGroup: "addons"
                     groupRelease: '{{default "" (index .metadata.labels "addonsRelease")}}'
-                    useSelectors: "true"
+                    useSelectors: "false"
                     useVersionSelectors: "true"
               - git:
                   repoURL: '{{ .metadata.annotations.fleet_repo_url }}'
@@ -122,7 +122,7 @@ spec:
           helm:
             ignoreMissingValueFiles: true
             valuesObject:
-              useSelectors: false
+              useSelectors: '{{.values.useSelectors}}'
               useVersionSelectors: '{{.values.useVersionSelectors}}'
               applicationSetGroup: {{.values.applicationSetGroup}}
             # Defining the way to group addons This application set will handly Addons and ACK values
