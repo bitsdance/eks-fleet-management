@@ -13,7 +13,7 @@ provider "helm" {
         "get-token",
         "--cluster-name", local.cluster_info.cluster_name,
         "--region", local.region,
-        "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
+        # "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
       ]
     }
   }
@@ -32,20 +32,26 @@ provider "kubernetes" {
       "get-token",
       "--cluster-name", local.cluster_info.cluster_name,
       "--region", local.region,
-      "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
+      # "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
     ]
   }
 }
 
 provider "aws" {
   region = "eu-west-2"
-  assume_role {
-    role_arn     = "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
-    session_name = "cross-account"
-  }
+  # assume_role {
+  #   role_arn     = "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
+  #   session_name = "cross-account"
+  # }
 }
 
 terraform {
   backend "s3" {
+    bucket         = "terraform-state-eks-fleet-management"
+    key            = "spokes/terraform.tfstate"
+    region         = "eu-west-2"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+    profile        = "ekshub"
   }
 }

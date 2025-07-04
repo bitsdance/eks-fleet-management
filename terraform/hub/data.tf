@@ -11,7 +11,7 @@ data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
 }
 data "aws_iam_roles" "eks_admin_role" {
-  name_regex = "AWSReservedSSO_AdministratorAccess_.*"
+  name_regex = "AWSReservedSSO_.*AdministratorAccess.*"
 }
 
 data "aws_vpc" "vpc" {

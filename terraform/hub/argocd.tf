@@ -29,25 +29,22 @@ resource "kubernetes_secret" "git_secrets" {
   depends_on = [kubernetes_namespace.argocd]
   for_each = {
     git-addons = {
-      type                    = "git"
-      url                     = local.gitops_addons_repo_url
-      githubAppID             = base64decode(local.git_data["github_app_id"])
-      githubAppInstallationID = base64decode(local.git_data["github_app_installation_id"])
-      githubAppPrivateKey     = base64decode(local.git_data["github_private_key"])
+      type     = "git"
+      url      = local.gitops_addons_repo_url
+      username = base64decode(local.git_data["username"])
+      password = base64decode(local.git_data["password"])
     }
     git-fleet = {
-      type                    = "git"
-      url                     = local.gitops_fleet_repo_url
-      githubAppID             = base64decode(local.git_data["github_app_id"])
-      githubAppInstallationID = base64decode(local.git_data["github_app_installation_id"])
-      githubAppPrivateKey     = base64decode(local.git_data["github_private_key"])
+      type     = "git"
+      url      = local.gitops_fleet_repo_url
+      username = base64decode(local.git_data["username"])
+      password = base64decode(local.git_data["password"])
     }
     git-resources = {
-      type                    = "git"
-      url                     = local.gitops_resources_repo_url
-      githubAppID             = base64decode(local.git_data["github_app_id"])
-      githubAppInstallationID = base64decode(local.git_data["github_app_installation_id"])
-      githubAppPrivateKey     = base64decode(local.git_data["github_private_key"])
+      type     = "git"
+      url      = local.gitops_resources_repo_url
+      username = base64decode(local.git_data["username"])
+      password = base64decode(local.git_data["password"])
     }
     argocd-bitnami = {
       type      = "helm"
@@ -76,12 +73,14 @@ resource "kubernetes_secret" "git_secrets" {
 
 ################################################################################
 # Creating parameter for argocd hub role for the spoke clusters to read
+# NOTE: This should actually be created by the HUB cluster, not the spoke cluster
 ################################################################################
-resource "aws_ssm_parameter" "argocd_hub_role" {
-  name  = "/${local.cluster_name}/argocd-hub-role"
-  type  = "String"
-  value = module.argocd_hub_pod_identity.iam_role_arn
-}
+# resource "aws_ssm_parameter" "argocd_hub_role" {
+#   provider = aws.shared-services
+#   name     = "/${local.cluster_name}/argocd-hub-role"
+#   type     = "String"
+#   value    = module.argocd_hub_pod_identity.iam_role_arn
+# }
 ################################################################################
 # GitOps Bridge: Bootstrap
 ################################################################################

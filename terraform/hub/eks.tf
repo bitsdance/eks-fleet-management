@@ -7,7 +7,7 @@ module "eks" {
   cluster_endpoint_public_access = var.eks_cluster_endpoint_public_access
 
   vpc_id                   = data.aws_vpc.vpc.id
-  subnet_ids               = data.aws_subnets.intra_subnets.ids
+  subnet_ids               = data.aws_subnets.private_subnets.ids  # Use private subnets for node groups
   control_plane_subnet_ids = data.aws_subnets.private_subnets.ids
 
   cluster_security_group_additional_rules = {
@@ -22,20 +22,8 @@ module "eks" {
   }
 
   enable_cluster_creator_admin_permissions = true
-  access_entries = {
-    # access entry with a policy associated for admins
-    kube-admins = {
-      principal_arn = tolist(data.aws_iam_roles.eks_admin_role.arns)[0]
-      policy_associations = {
-        admins = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
-  }
+  # Remove duplicate access entry since cluster creator permissions are enabled above
+  access_entries = {}
 
   eks_managed_node_groups = local.enable_automode ? {} : {
     platform = {

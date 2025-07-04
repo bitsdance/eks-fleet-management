@@ -5,16 +5,16 @@
 ################################################################################
 # Cluster Related values
 ################################################################################
-tenant: "eks-auto" # Tenancy membership that will help us define the folder structure
-clusterName: "spoke-test-auto-workload1"
-addons_repo_basepath: "tenants/addons" # Individuall path of eatch cluster we deploy helper for folder strucure
-resources_repo_basepath: "tenants/resources"
-secretManagerSecretName: "hub-cluster-auto/spoke-test-auto-workload1" # Name of secret that we get information about the cluster
+tenant:  "tenant1" # Tenancy membership that will help us define the folder structure
+clusterName: "spoke-np"
+addons_repo_basepath: "addons/tenants" # Individuall path of eatch cluster we deploy helper for folder strucure
+resources_repo_basepath: "resources/tenants"
+secretManagerSecretName: "arn:aws:secretsmanager:eu-west-2:609177035700:secret:hub-cluster/spoke-np-SjO9xv" # Name of secret that we get information about the cluster
 ################################################################################
 # TRepository connection
 ################################################################################
-githubSecret: "false"
-githubSecretName: "github/gitops/app-creds" # Name of secret for information about the github
+# githubSecret: "false"  for the agent model
+# githubSecretName: "github/gitops/app-creds" # Name of secret for information about the github this is also for agent model
 ################################################################################
 # Values that Define the type of Argo Destributed or Centralised
 ################################################################################
@@ -22,7 +22,7 @@ use_remote_argo: "false" # Will define if it will install argocd on the spoke cl
 ################################################################################
 # Defining what type of resources we will deploy on the spoke cluster using the 'agent' model the following will update the lables of the secret of the spoke cluster 
 ################################################################################
-use_external_secrets: "false"
 enable_remote_resources: "false"
 enable_remote_addons: "false"
 use_fleet_ack: "false"
+use_argocd_ingress: "false"

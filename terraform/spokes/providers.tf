@@ -11,13 +11,11 @@ provider "helm" {
         "eks",
         "get-token",
         "--cluster-name", local.cluster_info.cluster_name,
-        "--region", local.region,
-        "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
+        "--region", local.region
       ]
     }
   }
 }
-
 
 provider "kubernetes" {
   host                   = local.cluster_info.cluster_endpoint
@@ -31,26 +29,22 @@ provider "kubernetes" {
       "eks",
       "get-token",
       "--cluster-name", local.cluster_info.cluster_name,
-      "--region", local.region,
-      "--role-arn", "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
+      "--region", local.region
     ]
   }
 }
 
 provider "aws" {
   region = "eu-west-2"
-  assume_role {
-    role_arn     = "arn:aws:iam::${local.account_config.account_id}:role/cross-account-role"
-    session_name = "cross-account"
-  }
 }
 
 provider "aws" {
   alias  = "shared-services"
   region = "eu-west-2"
   assume_role {
-    role_arn     = "arn:aws:iam::471112582304:role/cross-account-role"
-    session_name = "shared-shervices"
+    role_arn     = "arn:aws:iam::140023360843:role/cross-account-role"
+    session_name = "shared-services"
+    external_id  = "eks-fleet-management"
   }
 }
 
@@ -58,5 +52,3 @@ terraform {
   backend "s3" {
   }
 }
-
-

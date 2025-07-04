@@ -20,17 +20,17 @@ module "eks" {
 
   access_entries = {
     # access entry with a policy associated for admins
-    kube-admins = {
-      principal_arn = tolist(data.aws_iam_roles.eks_admin_role.arns)[0]
-      policy_associations = {
-        admins = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
+    # kube-admins = {
+    #   principal_arn = tolist(data.aws_iam_roles.eks_admin_role.arns)[0]
+    #   policy_associations = {
+    #     admins = {
+    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    #       access_scope = {
+    #         type = "cluster"
+    #       }
+    #     }
+    #   }
+    # }
     argo = {
       principal_arn = aws_iam_role.spoke.arn
       policy_associations = {
