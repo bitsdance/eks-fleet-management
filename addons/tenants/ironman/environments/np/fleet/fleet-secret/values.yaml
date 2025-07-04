@@ -1,4 +1,3 @@
-# externalSecret:
-#   labels:
-#     addonsRelease: releaseA
-#     manitoringRelease: releaseA
+externalSecret:
+  labels:
+    enable_ack_eks: true
