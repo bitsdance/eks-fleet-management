@@ -1,0 +1,51 @@
+# Spoke Cluster Configuration
+# Target Account: 123456789012 (staging account)
+# Region: eu-west-2
+# Direct deployment (no cross-account role needed)
+
+# VPC Configuration
+vpc_name = "eks-fleet-staging-workload-1"
+
+# Cluster Configuration
+kubernetes_version = "1.32"
+enable_automode = true
+tenant = "tenant1"
+cluster_type = "tenant"
+
+# Hub Configuration
+hub_account_id = "140023360843"
+hub_cluster_name = "hub-cluster"
+
+# Environment Configuration
+deployment_environment = "staging"
+environment_prefix = "staging"
+
+# Account Configuration
+accounts_config = {
+  default = {
+    account_id = "367123725217"  # Staging account ID
+  }
+}
+
+# Node Group Configuration (for non-automode components)
+managed_node_group_ami = "BOTTLEROCKET_x86_64"
+managed_node_group_instance_types = ["m5.large"]
+
+# Cluster Endpoint Configuration
+eks_cluster_endpoint_public_access = true
+
+# Domain Configuration (optional)
+domain_name = ""
+route53_zone_name = ""
+
+# Observability Configuration (optional)
+amp_prometheus_crossaccount_role = ""
+
+# KMS Configuration
+kms_key_admin_roles = []
+
+# Remote spoke secret configuration
+remote_spoke_secret = false
+
+# ACK Pod Identity (use terraform for now)
+enable_ack_pod_identity = false
