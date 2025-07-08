@@ -42,7 +42,7 @@ provider "aws" {
   alias  = "shared-services"
   region = "eu-west-2"
   assume_role {
-    role_arn     = "arn:aws:iam::140023360843:role/cross-account-role"
+    role_arn     = "arn:aws:iam::${var.hub_account_id}:role/cross-account-role"
     session_name = "shared-services"
     external_id  = "eks-fleet-management"
   }
