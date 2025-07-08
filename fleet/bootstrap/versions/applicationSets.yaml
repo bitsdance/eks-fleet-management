@@ -11,6 +11,11 @@ releases:
     chartRepo: "471112582304.dkr.ecr.eu-west-2.amazonaws.com"
     ecrChartName: "application-sets"
     version: 0.3.1
+  - type: "release2"
+    use_helm_repo_path: "true"
+    chartRepo: "471112582304.dkr.ecr.eu-west-2.amazonaws.com"
+    ecrChartName: "application-sets"
+    version: 0.3.1
   monitoring:
   - type: "default"
     use_helm_repo_path: "true"
