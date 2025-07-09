@@ -3,5 +3,5 @@ externalSecret:
     fleetRelease: default
     addonsRelease: release2
     monitoringRelease: default
-    enable_metrics_server: "false"
+    enable_metrics_server: "true"
     enable_external_secrets: "true"
