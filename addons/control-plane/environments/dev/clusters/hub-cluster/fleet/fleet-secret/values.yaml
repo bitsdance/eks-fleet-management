@@ -9,4 +9,4 @@ externalSecret:
     enable_external_dns: "true"
     enable_ack_iam: "true"
     enable_ack_eks: "true"
-    tenant: "control-plane"  # Override the tenant label to use control-plane structure
+    # No need to specify tenant here as it will use the folder structure
