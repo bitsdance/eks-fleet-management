@@ -3,3 +3,5 @@ externalSecret:
     monitoringRelease: default
     addonsRelease: default
     tenant: "control-plane"
+  annotations:
+    tenant: "control-plane"
